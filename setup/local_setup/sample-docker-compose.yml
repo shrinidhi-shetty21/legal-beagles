@@ -1,0 +1,149 @@
+version: '3.8'
+services:
+  worker-ca:
+    build:
+      context: ./
+      dockerfile: ./dockerfiles/worker/Dockerfile
+    image: testing-codaxtr-extractor-legal-beagles-worker:latest
+    container_name: worker-ca
+    #command: sh -c "celery -A .celery_config worker -Q ca_extractor,ca_refresh_case_by_case_number,ca_people_finder,ca_pacer_import_case,ca_docket_processing,ca_download_document,ca_recap_ia,ca_county_import_case,ca_ramp_up_incremental_extractor,ca_ramp_up_date_range_extractor,ca_date_range_download,ca_parse_file,ca_schedule_run,ca_update_docket_entry,ca_document_parse,ca_extractor_webhook,ca_p_extractor,ca_p_refresh_case_by_case_number,ca_cancel_request,ca_p_people_finder,ca_p_pacer_import_case,ca_p_docket_processing,ca_p_download_document,ca_p_recap_ia,ca_p_county_import_case,ca_p_ramp_up_incremental_extractor,ca_p_ramp_up_date_range_extractor,ca_p_date_range_download,ca_p_parse_file,ca_p_schedule_run,ca_p_update_docket_entry,ca_p_document_parse,ca_p_extractor_webhook,ca_import_document_health_check,ca_p_cancel_request,ca_case_extraction_health_check,ca_proxy_health_check,ca_p_import_document_health_check,ca_p_case_extraction_health_check,ca_p_proxy_health_check,ca_parse_judgement,ca_p_parse_judgement --loglevel=info --concurrency 1 -n w1.%h -Ofair -- celeryd.prefetch_multiplier=1"
+    command: sh
+    volumes:
+      - /home/mis/workspace/aws_credentials:/root/.aws
+      - /home/mis/workspace/codaxtr-instance-resources:/root/codaxtr-instance-resources/
+      - /home/mis/workspace/legal-beagles/src:/root/legal-beagles/src
+      - /home/mis/workspace/codaxtr_html:/root/codaxtr_html
+      - /home/codaxtr_user/casedocs/:/root/casedocs/
+    stdin_open: true # docker attach container_id
+    tty: true # docker attach container_id
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 700M
+    environment:
+      - APPLICATION=codaxtr-extractor
+      - MODULE=worker
+      - STATUS=test
+      - C_FORCE_ROOT=True
+      # CODAXTR Broker Credentials
+      - BROKER_PASSWORD=
+      - BROKER_USERNAME=
+      - BROKER_HOST=
+      - BROKER_PORT=7762
+      - BROKER_VHOST=codaxtr
+      # Django Credentials
+      - DJANGO_USERNAME=
+      - DJANGO_PASSWORD=
+      # CENTRAL Database Credentials
+      - CENTRAL_USERNAME=
+      - CENTRAL_PASSWORD=
+      - CENTRAL_DBHOST=
+      - CENTRAL_DBPORT=
+      # REMOTE Database Credentials
+      - REMOTE_USERNAME=
+      - REMOTE_PASSWORD=
+      - CODAXTR_DBHOST=
+      - CODAXTR_DBPORT=
+      - ROOT_USERNAME=
+      - ROOT_PASSWORD=
+      # MISC UTILS Database Credentials
+      - MISC_UTIL_DBHOST=
+      - MISC_UTIL_DBPORT=
+      - MISC_UTIL_USERNAME=
+      - MISC_UTIL_PASSWORD=
+      # CODAXTR BEAT credentials
+      - BEAT_DBHOST=
+      - BEAT_DBPORT=
+      - BEAT_USERNAME=
+      - BEAT_PASSWORD=
+      - INSIGHT_VIEW_USERNAME=
+      - INSIGHT_VIEW_PASSWORD=
+      - INSIGHT_VIEW_PORT=
+      # HTTP proxy
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+      - CODAXTR_REDIS_HOST=test-codaxtr-elasticache-redis.vdcyrt.0001.use1.cache.amazonaws.com
+      - CODAXTR_REDIS_PORT=6379
+
+  patch-ca:
+    build:
+      context: ./
+      dockerfile: ./dockerfiles/worker/Dockerfile
+    image: testing-codaxtr-extractor-legal-beagles-patch:latest
+    container_name: patch-ca
+    #command: sh -c "celery -A .celery_config worker -Q ca_extractor,ca_refresh_case_by_case_number,ca_people_finder,ca_pacer_import_case,ca_docket_processing,ca_download_document,ca_recap_ia,ca_county_import_case,ca_ramp_up_incremental_extractor,ca_ramp_up_date_range_extractor,ca_date_range_download,ca_parse_file,ca_schedule_run,ca_update_docket_entry,ca_document_parse,ca_extractor_webhook,ca_p_extractor,ca_p_refresh_case_by_case_number,ca_cancel_request,ca_p_people_finder,ca_p_pacer_import_case,ca_p_docket_processing,ca_p_download_document,ca_p_recap_ia,ca_p_county_import_case,ca_p_ramp_up_incremental_extractor,ca_p_ramp_up_date_range_extractor,ca_p_date_range_download,ca_p_parse_file,ca_p_schedule_run,ca_p_update_docket_entry,ca_p_document_parse,ca_p_extractor_webhook,ca_import_document_health_check,ca_p_cancel_request,ca_case_extraction_health_check,ca_proxy_health_check,ca_p_import_document_health_check,ca_p_case_extraction_health_check,ca_p_proxy_health_check,ca_parse_judgement,ca_p_parse_judgement --loglevel=info --concurrency 1 -n w1.%h -Ofair -- celeryd.prefetch_multiplier=1"
+    command: sh
+    volumes:
+      - /home/mis/workspace/aws_credentials:/root/.aws
+      - /home/mis/workspace/codaxtr-instance-resources:/root/codaxtr-instance-resources
+      - /home/mis/workspace/legal-beagles/src:/root/legal-beagles/src
+      - /home/mis/workspace/legal-beagles/patch:/root/legal-beagles/patch
+      - /home/mis/workspace/codaxtr_html:/root/codaxtr_html
+      - /home/mis/workspace/casedocs:/root/casedocs
+    stdin_open: true # docker attach container_id
+    tty: true # docker attach container_id
+    environment:
+      - APPLICATION=codaxtr-extractor
+      - MODULE=worker
+      - STATUS=test
+      - C_FORCE_ROOT=True
+      # CODAXTR Broker Credentials
+      - BROKER_PASSWORD=
+      - BROKER_USERNAME=
+      - BROKER_HOST=
+      - BROKER_PORT=7762
+      - BROKER_VHOST=codaxtr
+      # Django Credentials
+      - DJANGO_USERNAME=
+      - DJANGO_PASSWORD=
+      # CENTRAL Database Credentials
+      - CENTRAL_USERNAME=
+      - CENTRAL_PASSWORD=
+      - CENTRAL_DBHOST=
+      - CENTRAL_DBPORT=
+      # REMOTE Database Credentials
+      - REMOTE_USERNAME=
+      - REMOTE_PASSWORD=
+      - CODAXTR_DBHOST=
+      - CODAXTR_DBPORT=
+      - ROOT_USERNAME=
+      - ROOT_PASSWORD=
+      # MISC UTILS Database Credentials
+      - MISC_UTIL_DBHOST=
+      - MISC_UTIL_DBPORT=
+      - MISC_UTIL_USERNAME=
+      - MISC_UTIL_PASSWORD=
+      # CODAXTR BEAT credentials
+      - BEAT_DBHOST=
+      - BEAT_DBPORT=
+      - BEAT_USERNAME=
+      - BEAT_PASSWORD=
+      - INSIGHT_VIEW_USERNAME=
+      - INSIGHT_VIEW_PASSWORD=
+      - INSIGHT_VIEW_PORT=
+      # HTTP proxy
+      - HTTP_PROXY=
+      - HTTPS_PROXY=
+
+## Selenium Grid Containers - Uncomment the below lines to bring up the Selenium Grid Containers
+#  service-extractor-selenium-hub:
+#    image: selenium/hub:3.141.59-zirconium
+#    container_name: service-extractor-selenium-hub
+#    ports:
+#      - "4444:4444"
+#
+#  firefox:
+#    image: selenium/node-firefox:3.141.59-zirconium
+#    volumes:
+#      - /dev/shm:/dev/shm
+#    depends_on:
+#      - selenium-hub
+#    environment:
+#      - HUB_HOST=service-extractor-selenium-hub
+#      - HUB_PORT=4444
+
+networks:
+  default:
+    external:
+      name: core-3_custom_network

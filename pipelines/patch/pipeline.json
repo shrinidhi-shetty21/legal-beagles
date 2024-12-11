@@ -1,0 +1,7 @@
+{
+  "application_name": "codaxtr",
+  "module_name": "legal-beagles-extractor-patch",
+  "major_version": "v_1",
+  "docker_context": "legal-beagles",
+  "docker_file": "legal-beagles/dockerfiles/patch/Dockerfile"
+}
